@@ -9,6 +9,7 @@ using namespace std;
 
 //New Comment to test GitHub
 
+//  This is a new comment that I'm going to commit.
 double get_lat_ratio(double);
 double get_long_ratio(double);
 
@@ -35,25 +36,25 @@ int main()
     //Instatiate the ifstream class with an object named inputFile
     ifstream inputFile;
     ofstream outputFile;
-                   
+
                 // Declare constants
                 const double PI = 3.14159265358979323;
-               
-                
+
+
     // Declare variables to hold the input read from the file
-    string NSbearing, EWbearing, units, unit_Choice, oil_and_gas_play;    
-    double Degrees, Minutes, Seconds, distance, POBlat,POBlong, lat, long_, decimalDegrees, azimuthDegrees, aRadians, hypotenuseInFeet, xInFeetToBeAdded, 
+    string NSbearing, EWbearing, units, unit_Choice, oil_and_gas_play;
+    double Degrees, Minutes, Seconds, distance, POBlat,POBlong, lat, long_, decimalDegrees, azimuthDegrees, aRadians, hypotenuseInFeet, xInFeetToBeAdded,
                                                 yInFeetToBeAdded, xInDegreesOfLongToBeAdded, yInDegreesOfLatToBeAdded, xratio, yratio;
-											
-         
-                
+
+
+
                     while(authenticate_license() == 0)
 					{
 						cout << "Your license for this product has expired.  Please contact \nDaniel Cardin at (720) 440-1741 or dcardin@cardinoil.com \nfor a renewal.\n\n";
 						system("pause");
                     }
 
-					           
+
 				cout << "What units are used in your data?\n\n";
 				cout << "(f) Feet\n";
 				cout << "(v) Varas\n";
@@ -62,21 +63,21 @@ int main()
 				cout << "(p) Poles\n";
 				cout << "(y) Yards\n";
                 cin >> unit_Choice;
-						
-				
-	                     
+
+
+
     //
     inputFile.open("MB.txt");
     cout << "SOFTWARE BY DANIEL CARDIN\nCOPYRIGHT 2013\nALL RIGHTS RESERVED\n\n";
-    
-    //      05-29-2014 DC:  I'm going to loop through the MB file twice:  Once to count the number of MB calls to use as the size of an array to put the 
+
+    //      05-29-2014 DC:  I'm going to loop through the MB file twice:  Once to count the number of MB calls to use as the size of an array to put the
     //      lat/longs in and the second time to calculate the acreage of the resulting polygon so I can use that data in the KML to increase
     //      the richness of my content.  What's unfortunate is that I don't seem to be calculating acreage exactly correctly.  More complicated
     //      polygons are off by 3 or 4 percent on acreage, which is obviously unnacceptable long term.  I suspect it's some kind of rounding error.
-    
+
 	inputFile >> POBlat >> POBlong;
-	
-	        
+
+
 if(POBlat < 25 || POBlat > 50 || POBlong > -60 || POBlong < -125)  //  Check for out of bounds
 {
 
@@ -84,7 +85,7 @@ if(POBlat < 25 || POBlat > 50 || POBlong > -60 || POBlong < -125)  //  Check for
 	cout << "If this is an error, please correct the POB and rerun the \nprogram. ";
 	cout <<  "If it's not an error, please contact Petroleum Data Services, Inc. \nfor an international license.\n\n\n\n";
 	system("pause");
-	
+
 }
 
 //05-22-2014 DC:  Make sure that it doesn't matter if the person tries to forget the negative sign before the longitude
@@ -95,12 +96,12 @@ if(POBlong > 0)
 
 //  Now set the x_long_degrees_per_foot and Y_lat_degrees_per_foot based on the area
 // First I'll initialize the values to zero
-				xratio = 0; 				 
+				xratio = 0;
 				yratio = 0;
-				 
+
 				xratio = get_long_ratio(POBlat);  //They both take POB lat as the argument.  Weird but that is how it is
 				yratio = get_lat_ratio(POBlat);  //They both take POB lat as the argument.  Weird but that is how it is
-          
+
 	array_size = 0;
     while(!inputFile.eof())
 	{
@@ -115,22 +116,22 @@ if(POBlong > 0)
     inputFile >> POBlat >> POBlong;
     x_array[0] = POBlong;
     y_array[0] = POBlat;
-    
+
 	for(int count = 0; count < array_size-1; count++)
 	{
 	  // Get the metes and bounds calls from the MB file
 	  inputFile >> NSbearing >> Degrees >> Minutes >> Seconds >> EWbearing >> distance;
-       
+
         //calculate the decimal degrees from the degrees, minutes, and seconds in the deed
         decimalDegrees = Degrees + (Minutes/60)+(Seconds/60);
-        
+
                                                 //This set of nested "if" statements uses the bearing calls to turn the degrees into azimuth degrees
                                                 if (NSbearing == "N" || NSbearing == "n" || NSbearing == "8")
                                                 {
                                                                 if (EWbearing == "E" || EWbearing =="e" || EWbearing == "6")
-                                                                {              
+                                                                {
                                                                                 azimuthDegrees = decimalDegrees;
-                
+
                                                                 }
                                                                 else if (EWbearing == "W" || EWbearing == "w" || EWbearing == "4")
                                                                 {
@@ -142,61 +143,61 @@ if(POBlong > 0)
                                                 {
 
                                                                 if (EWbearing == "E" || EWbearing == "e" || EWbearing == "6")
-                                                                {              
+                                                                {
                                                                                 azimuthDegrees = 180-decimalDegrees;
-                
+
                                                                 }
                                                                 else if (EWbearing == "W" || EWbearing == "w" || EWbearing == "4")
                                                                 {
                                                                                 azimuthDegrees = 180+decimalDegrees;
                                                                 }
                                                                 //trailing else to handle incorrect input? (add later)
-                
+
                                                 }
                                                 //trailing else to handle incorrect input? (add later)
-                                              
-                                                
+
+
                                                 //convert azimuthDegrees into radians
                                                 aRadians = azimuthDegrees * PI/180.0;
-                                                
+
                                                 //find out how long the vector call is in feet (regardless of whether the call itself is in feet or varas)
                                               	//05-24-2014  I'm not too sure about putting all this in the loop, but I'm
-												 //going to try it								
+												 //going to try it
 												if(unit_Choice == "f"|| unit_Choice == "F"){hypotenuseInFeet = distance;}
 												if(unit_Choice == "v"|| unit_Choice == "V"){hypotenuseInFeet = distance * 2.77778333333;}
 												if(unit_Choice == "r"|| unit_Choice == "R"){hypotenuseInFeet = distance * 16.5;}
 												if(unit_Choice == "c"|| unit_Choice == "C"){hypotenuseInFeet = distance * 66;}
 												if(unit_Choice == "p"|| unit_Choice == "P"){hypotenuseInFeet = distance * 16.5;}
 												if(unit_Choice == "y"|| unit_Choice == "Y"){hypotenuseInFeet = distance * 3;}
-											                                                
+
                                                 //calculate the x and y in feet to be added
                                                 xInFeetToBeAdded = sin(aRadians) * hypotenuseInFeet;
                                                 yInFeetToBeAdded = cos(aRadians) * hypotenuseInFeet;
-                                                
+
                                                 //calculate the y(lat) and x(long) to be added
-                                                xInDegreesOfLongToBeAdded = (xInFeetToBeAdded * xratio); 
+                                                xInDegreesOfLongToBeAdded = (xInFeetToBeAdded * xratio);
                                                 yInDegreesOfLatToBeAdded = (yInFeetToBeAdded * yratio);
-                                                
+
     x_array[(count + 1)] = x_array[(count)] + xInDegreesOfLongToBeAdded;  //  05-29-2014  DC:  Put the x coordinate into an array element whose index is set by the count.
     y_array[(count + 1)] = y_array[(count)] + yInDegreesOfLatToBeAdded;  //  05-29-2014  DC:  Put the y coordinate into an array element whose index is set by the count.
-    
+
 	}
 	x_array[array_size] = POBlong;  //The last x in the array should be the x for the POB
 	y_array[array_size] = POBlat;   //The last x in the array should be the x for the POB
-	
+
     inputFile.close();  // 05-29-2014 DC:  Start again to reset the cursor.
     inputFile.open("MB.txt");
     system("pause");
-    
+
     //05-29-2014 DC:  Now I'm going to calculate the acreage.  I will eventually offload this functionality to a function, but I'm not
     //  perfectly confident about passing arrays to functions, so I'm going to wait until I have this working first.
-     
+
     /*This part is the KML code.  I may need to have the while loop kind of in the middle.*/
-	outputFile.open("Generated.kml");    
-	//This is my actual kml.  Notice that I have the escape character before all the quotes that actually neet to be part of the kml itself 
+	outputFile.open("Generated.kml");
+	//This is my actual kml.  Notice that I have the escape character before all the quotes that actually neet to be part of the kml itself
 	outputFile           							<< "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                                                	<< "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n"
-					
+
 												<<  "<Document>\n"
 													<<  "<name>";
 	//  05-27-2014 DC:  This should add created date to my kml name (2nd level)
@@ -291,30 +292,30 @@ if(POBlong > 0)
 																<<  "<LinearRing>\n"
 																	<<  "<coordinates>\n";
 	////////////////////////////////////////THIS IS WHERE ALL THE LATLONG PAIRS GO
-                // 
+                //
 //                 // put the POB lat/long pairs in there BEFORE the loop starts to get all the rest of them
 //                lat = POBlat;
 //                long_ = POBlong;
-//                
+//
 //    outputFile       << setprecision(13) << showpoint << fixed << long_ << "," << lat << ",0" << endl;
 //    cout                   << setprecision(13) << showpoint << fixed << long_ << "," << lat << ",0" << endl;
 //    //  Notice that the long is first in the kml, NOT LAT
-//    
-//    
+//
+//
     //Read in the metes and bounds calls from the file
     for(int count = 0; count < array_size; count++)
     {
        // Get the coordinates from the array
        lat = y_array[count];
        long_ = x_array[count];
-       outputFile << setprecision(13) << showpoint << fixed << long_ << "," << lat << ",0" << endl;  
-       
-                                          
-    }  
-		
+       outputFile << setprecision(13) << showpoint << fixed << long_ << "," << lat << ",0" << endl;
+
+
+    }
+
 	//  Now that the loop is done emitting points from the metes and bounds calls (i.e. the end of the MB file has been reached)
 	//  I'm going to arbitrarily add one last point:  The POB.  This way polygons will always close.
-	outputFile << setprecision(13) << showpoint << fixed << POBlong << "," << POBlat << ",0" << endl; 
+	outputFile << setprecision(13) << showpoint << fixed << POBlong << "," << POBlat << ",0" << endl;
 	outputFile           << "</coordinates>\n"
                                                 << "</LinearRing>\n"
                                                 << "</outerBoundaryIs>\n"
@@ -325,7 +326,7 @@ if(POBlong > 0)
                                                 << "<Placemark>"
 												<< "<name>Point of Beginning</name>"
 												<< "<visibility>0</visibility>"
-												
+
 												<< "	<LookAt>"
 												<< "		<longitude>" << POBlong << "</longitude>"
 												<< "		<latitude>" << POBlat << "</latitude>"
@@ -355,32 +356,32 @@ if(POBlong > 0)
 	//First I guess I have to close and then reopen the input file so I can start back at the beginning....?  (I wonder if there's a better way to do this...)
 				inputFile.close();
 				inputFile.open("MB.txt");
-				
+
 				inputFile >>  POBlat >> POBlong;
-                 
+
     //05-22-2014 DC:  Make sure that it doesn't matter if the person tries to forget the negative sign before the longitude
                  if(POBlong > 0)
 				{
 					POBlong = 0-POBlong;
 				}
-                 
-                
+
+
                  // put the POB lat/long pairs in there first (this time for the first call line string)
                 lat = POBlat;
                 long_ = POBlong;
-                               
+
     			outputFile << setprecision(13) << showpoint << fixed << long_ << "," << lat << ",0" << endl;
    	//05-23-2014 DC:  Get the first call (I'm not using the while loop this time because it's one and only one call.)
                   inputFile >> NSbearing >> Degrees >> Minutes >> Seconds >> EWbearing >> distance;
 				 decimalDegrees = Degrees + (Minutes/60)+(Seconds/60);
-        
+
                                                 //This set of nested "if" statements uses the bearing calls to turn the degrees into azimuth degrees
                                                 if (NSbearing == "N" || NSbearing == "n" || NSbearing == "8")
                                                 {
                                                                 if (EWbearing == "E" || EWbearing =="e" || EWbearing == "6")
-                                                                {              
+                                                                {
                                                                                 azimuthDegrees = decimalDegrees;
-                
+
                                                                 }
                                                                 else if (EWbearing == "W" || EWbearing == "w" || EWbearing == "4")
                                                                 {
@@ -392,24 +393,24 @@ if(POBlong > 0)
                                                 {
 
                                                                 if (EWbearing == "E" || EWbearing == "e" || EWbearing == "6")
-                                                                {              
+                                                                {
                                                                                 azimuthDegrees = 180-decimalDegrees;
-                
+
                                                                 }
                                                                 else if (EWbearing == "W" || EWbearing == "w" || EWbearing == "4")
                                                                 {
                                                                                 azimuthDegrees = 180+decimalDegrees;
                                                                 }
                                                                 //trailing else to handle incorrect input? (add later)
-                
+
                                                 }
                                                 //trailing else to handle incorrect input? (add later)
-                                              
-                                                
+
+
                                                 //convert azimuthDegrees into radians
                                                 aRadians = azimuthDegrees * PI/180.0;
-                                                
-                                                
+
+
 //                                                //find out how long the vector call is in feet (regardless of whether the call itself is in feet or varas)
 //                                                if (varasOrFeet == "varas" || varasOrFeet == "Varas" || varasOrFeet == "VARAS")
 //                                                {
@@ -417,7 +418,7 @@ if(POBlong > 0)
 //                                                }
 //                                                else
 //                                                {
-//                                                                hypotenuseInFeet = distance;   
+//                                                                hypotenuseInFeet = distance;
 //                                                }
 												if(unit_Choice == "f"|| unit_Choice == "F"){hypotenuseInFeet = distance;}
 												if(unit_Choice == "v"|| unit_Choice == "V"){hypotenuseInFeet = distance * 2.77778333333;}
@@ -425,23 +426,23 @@ if(POBlong > 0)
 												if(unit_Choice == "c"|| unit_Choice == "C"){hypotenuseInFeet = distance * 66;}
 												if(unit_Choice == "p"|| unit_Choice == "P"){hypotenuseInFeet = distance * 16.5;}
 												if(unit_Choice == "y"|| unit_Choice == "Y"){hypotenuseInFeet = distance * 3;}
-//                                                
+//
                                                 //calculate the x and y in feet to be added
                                                 xInFeetToBeAdded = sin(aRadians) * hypotenuseInFeet;
                                                 yInFeetToBeAdded = cos(aRadians) * hypotenuseInFeet;
-                                                
+
                                                 //calculate the y(lat) and x(long) to be added
-                                                xInDegreesOfLongToBeAdded = (xInFeetToBeAdded * xratio); 
+                                                xInDegreesOfLongToBeAdded = (xInFeetToBeAdded * xratio);
                                                 yInDegreesOfLatToBeAdded = (yInFeetToBeAdded * yratio);
-                                                                                                                                                
+
                                 //Get the next set of lat longs  This time it will only happen once, so I'm not doing all that "if EOF" stuff
 								lat = lat + yInDegreesOfLatToBeAdded;
-								long_ = long_ + xInDegreesOfLongToBeAdded;                                                         
+								long_ = long_ + xInDegreesOfLongToBeAdded;
                                 //This writes it to the actual kml
-                                outputFile << setprecision(13) << showpoint << fixed << long_ << "," << lat << ",0" << endl;   	
- 
-                                
-												
+                                outputFile << setprecision(13) << showpoint << fixed << long_ << "," << lat << ",0" << endl;
+
+
+
 								outputFile		<< "</coordinates>"
 												<< "</LineString>"
 												<< "</Placemark>"
@@ -455,16 +456,16 @@ if(POBlong > 0)
 		cumulative_acreage = (cumulative_acreage * -1);
     }
     cout << setprecision(2) << "Your calculated acreage is: " << cumulative_acreage << endl;
-    
+
 	system("pause");
     return 0;
-    
+
     }
-		
+
 double get_long_ratio(double POBlat)
 
 {
-	
+
 //  Now I'll test for area to decide what ratio to use.
 //  Note that both lat AND long are dependent on the Y coordinate and
 //  they are pretty much constant at a constant Y even x changes greatly...weird
@@ -638,11 +639,11 @@ return Y_lat_degrees_per_foot;
 }
 
 bool authenticate_license()
-{	
+{
 	return 0;
 	/*
 	long dan = time(0);
-                if(dan > 2483228800)  //This expiration date is at precisely midnight on 12/31/2016.  
+                if(dan > 2483228800)  //This expiration date is at precisely midnight on 12/31/2016.
 				{
 					return 0;
                 }
@@ -651,4 +652,3 @@ bool authenticate_license()
 					return 1;
                 }*/
 }
-
