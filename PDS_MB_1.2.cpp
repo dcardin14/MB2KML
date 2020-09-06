@@ -101,6 +101,7 @@ if(POBlong > 0)
 
 				xratio = get_long_ratio(POBlat);  //They both take POB lat as the argument.  Weird but that is how it is
 				yratio = get_lat_ratio(POBlat);  //They both take POB lat as the argument.  Weird but that is how it is
+#here is a comment that wasn't here before
 
 	array_size = 0;
     while(!inputFile.eof())
