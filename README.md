@@ -1,6 +1,3 @@
-# MB2KML  04-20-2017 DC:  This is a small executable that reads metes and bounds calls from a text file which must be 
-filenamed "MB.txt" and be in the same directory as the .exe.  
-
 *****THE INPUT comes from "MB.txt" which has the lat/long coordinate pair for the point of beginning, followed by all the metes 
 and bounds calls in the following format:
 
@@ -29,10 +26,3 @@ the shape of the tract drawn, I adjust the POB.  This is made easier by the POB 
 
 ****THE MISSING FEATURES, in my opinion are as follows: Obviously, forkers can do as they please, but I'd love to merge 
 some of the following functionality into the main branch if someone is kind enough to help!:
-
-1.) Shapefile output (if it doesn't add too much complexity ... I love quick and easy and it's meant to be a minimalist program.)
-2.) Calculated acreage in the filename or layer name of the output.
-3.) Handling for curves.  Currently, only straight lines are supported.
-4.) Allow comments in the MB file.  It would be great to say "//this is the corner by the red barn" after a deed call.
-
-THANKS FOR TAKING THE TIME TO READ THIS!!!
